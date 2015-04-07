@@ -1,0 +1,17 @@
+td {
+  width: 25px;
+  height: 25px;
+  border: 1px solid black;
+}
+
+tr.0 {
+  display:none;
+}
+
+#over {
+  text:120px;
+}
+
+#newGame {
+  text:120px;
+}
