@@ -3,6 +3,13 @@ speed = 500;
 
 //Draw the grid
 tetris.drawPlayField = function(){
+  $('#title').remove();
+  $('#newGame').remove();
+  tetris.currentCoor = tetris.shapeToCoor(tetris.currentShape, tetris.origin);
+  tetris.fillCells(tetris.currentCoor,'black');
+  gravity = window.setInterval(function(){
+    tetris.drop();
+  }, speed);
   for(var row=0;row<22;row++){
     $('#playfield').append('<tr class="'+row+'"></tr>');
     for (var col=0;col<10;col++){
@@ -11,6 +18,12 @@ tetris.drawPlayField = function(){
   }
 }
 
+// Start Screen
+
+tetris.startScreen = function(){
+  $('body').append("<div id='title' style='font-size:120px'> Tetris </div> <br>"
+  + " <input id='newGame' style='height: 50px; width: 20em;' type='button' value='newGame' onClick='tetris.drawPlayField()'> <br><br>");
+}
 
 //Fill the cells
 tetris.fillCells = function(coordinates,fillColor){
@@ -37,7 +50,7 @@ tetris.spawn = function(){
 tetris.drop = function(addTime){
   if(addTime != false){
     x = parseFloat($('#time').text());
-    tetris.timePlayed = (x + (speed/1000));
+    tetris.timePlayed = parseFloat(Math.round((x + (speed/1000)) * 100) / 100).toFixed(2);
     $("#time").text(tetris.timePlayed);
   }
   var reverse = false;
@@ -62,13 +75,18 @@ tetris.drop = function(addTime){
         localStorage.setItem('highScore', 0);
       }
       var newHigh = localStorage.getItem("highScore") < tetris.score;
-      var congratulations = (newHigh ? "Congratulations on your new High Score!!!" : "");
+      var congratulations = (newHigh ? "Congratulations you set a new High Score of " + tetris.score + "!!!" : "");
       localStorage.setItem('highScore', (localStorage.getItem("highScore") > tetris.score ? localStorage.getItem("highScore") : tetris.score));
       $("body").text("").append("<div id='over' style='font-size:120px'> Game Over </div> <br>"
       + " <input style='height: 50px; width: 20em;' type='button' value='newGame' onClick='window.location.reload()'> <br><br>"
       + " <div id='score'> Score:" + tetris.score + " </div> <br>"
       + " <div id='highScore'> High Score: " + localStorage.getItem("highScore") + " </div> <br> "
       + " <div id='congratulations'> " + congratulations + " </div>");
+      $('body').on('click', '#newGame', function(){
+        console.log("hello");
+        this.value.click();
+      });
+      $('body').click();
     }
   }
   this.fillCells(this.currentCoor, 'black');
@@ -79,9 +97,7 @@ tetris.drop = function(addTime){
   }
 }
 
-var gravity = window.setInterval(function(){
-    tetris.drop();
-}, speed);
+
 
 //Move current shape
 tetris.move = function(direction){
@@ -486,9 +502,9 @@ tetris.shapeToCoor = function(shape, origin){
 // }
 
 $(document).ready(function() {
-  tetris.currentCoor = tetris.shapeToCoor(tetris.currentShape, tetris.origin);
-  tetris.drawPlayField();
-  tetris.fillCells(tetris.currentCoor,'black');
+
+  tetris.startScreen();
+
   // gravity();
 
 
