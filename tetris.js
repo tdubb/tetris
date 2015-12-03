@@ -83,6 +83,11 @@ tetris.drop = function(addTime){
         localStorage.setItem('highScore', 0);
       }
       var endTime = parseFloat($('#time').text());
+      if (endTime*30 < resume.length) {
+        var text = " <input id='revealText' style='height: 50px; width: 20em;' type='button' value='Reveal Text' onClick='tetris.revealResume()'> <br><br>"
+      } else {
+        var text = ""
+      }
       var newHigh = localStorage.getItem("highScore") < tetris.score;
       var congratulations = (newHigh ? "Congratulations you set a new High Score of " + tetris.score + "!!!" : "");
       localStorage.setItem('highScore', (localStorage.getItem("highScore") > tetris.score ? localStorage.getItem("highScore") : tetris.score));
@@ -93,7 +98,7 @@ tetris.drop = function(addTime){
       + " <div id='congratulations'> " + congratulations + " </div> <br>"
       + " <div id='title'> About Me: </div><br>"
       + " <div id='biography' style='width: 40%'> " +resume.substr(0,endTime*30)+ " </div><br>"
-      + " <input id='revealText' style='height: 50px; width: 20em;' type='button' value='Reveal Text' onClick='tetris.revealResume()'> <br><br>");
+      + text);
       $('body').on('click', '#newGame', function(){
         console.log("hello");
         this.value.click();
@@ -118,7 +123,7 @@ tetris.revealResume = function(){
 
 
 //Move current shape
-tetris.move = function(direction){
+tetris.move = function(direction, e){
   this.fillCells(this.currentCoor,'');
 
   //move origin
@@ -141,6 +146,7 @@ tetris.move = function(direction){
   this.currentCoor = this.shapeToCoor(this.currentShape,this.origin);
 
   this.fillCells(this.currentCoor,'black');
+  e.preventDefault();
 }
 
 $(document).keydown(function(e){
@@ -160,6 +166,7 @@ $(document).keydown(function(e){
       tetris.drop();
     }, speed);
   }
+  e.preventDefault();
 })
 
 
@@ -199,7 +206,7 @@ tetris.pause = function(){
 
 // Rotate the shape
 
-tetris.rotate = function(){
+tetris.rotate = function(e){
   var lastShape = this.currentShape;
   var ninety = /90/;
   var oneEighty = /180/;
@@ -224,10 +231,11 @@ tetris.rotate = function(){
 
   this.currentCoor = this.shapeToCoor(this.currentShape,this.origin);
   this.fillCells(this.currentCoor,'black');
+  e.preventDefault();
 }
 
 //If we need to reverse
-tetris.ifReverse = function(){
+tetris.ifReverse = function(e){
   for(var i=0;i<this.currentCoor.length;i++){
     var row = this.currentCoor[i].row;
     var col = this.currentCoor[i].col;
@@ -237,6 +245,7 @@ tetris.ifReverse = function(){
     }
   }
   return false;
+  e.preventDefault();
 }
 
 // Empty full row
@@ -366,7 +375,7 @@ tetris.shapeToCoor = function(shape, origin){
     {row:origin.row, col:origin.col+1},
     {row:origin.row+1, col:origin.col+1}
     ]
-  }else if(shape === 'O'){
+  }else if(shape === 'O' || 'O90' || 'O180' || 'O270'){
     return [
     {row:origin.row, col:origin.col},
     {row:origin.row+1, col:origin.col},
