@@ -15,3 +15,12 @@ tr.0 {
 #newGame {
   text:120px;
 }
+
+#biography {
+  width: 30%;
+  position: absolute;
+}
+
+#wrapper {
+  width: 40%;
+}

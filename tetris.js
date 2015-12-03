@@ -16,13 +16,19 @@ tetris.drawPlayField = function(){
       $('tr.'+row).append('<td id="'+col+'"></td>');
     }
   }
+
+  var dynamic = $('#playfield');
+  var static = $('#biography');
+
+  // static.setAttribute("style", "margin-top:" + "-"+dynamic.height() + "px");
+  static.css('margin-top', '-'+(dynamic.height()+17)+"px").css('margin-left', '375px');
 }
 
 // Start Screen
 
 tetris.startScreen = function(){
   $('body').append("<div id='title' style='font-size:120px'> Tetris </div> <br>"
-  + " <input id='newGame' style='height: 50px; width: 20em;' type='button' value='newGame' onClick='tetris.drawPlayField()'> <br><br>");
+  + " <input id='newGame' style='height: 50px; width: 20em;' type='button' value='New Game' onClick='tetris.drawPlayField()'> <br><br>");
 }
 
 //Fill the cells
@@ -47,11 +53,13 @@ tetris.spawn = function(){
 
 // Drop && Gravity
 
+var resume = "My name is Tyler Wasden and I'm a rails developer in Austin, TX. <br><br> I started my journey into software development 3 years ago, graduated from MakerSquare(back when they still taught Ruby on Rails) here in Austin 2 years ago and have been in the startup scene ever since. <br> <br> I currently work for a great company that provides patient throughput software to hospitals around the country and world(I was hired to lead the internationalization effort and was happy to deliver ahead of schedule and expectations).  Since My first project I've enjoyed creating a help app with the accompanying Oauth configuration for our main app to act as the provider and the help app as the consumer.  As well as revamping our reporting by reducing page load time and enabling easier navigation of the returned data.  Along with building internal tools to allow our support team to take on tasks that previously tied up developer time.  We offer three different products and I've worked intimately with all of them, the newest one, Admit Control, was just released and we have our first customer install this month(December 2015).  I am proud to have created the paging system that alerts charge nurses to new patients assigned to their units via their preferred device(email or text). <br><br> I appreciate the wide array of challenges I have been presented with and while I know that I'm not close to knowing it all I do have the confidence and determination to figure out the task currently at hand(whatever it may be). <br><br> I'm impressed by RealHQ's rapid growth and unique yet practical solution to a very common problem; who do you trust to help you find the home that's right for you?  I know that with growth comes unexpected obstacles and interesting puzzles to solve, I would love to help solve those puzzles.  I also appreciate your preference for talent, creativity and open communication over location.  We currently work remotely 4 days a week and I enjoy the freedom and productivity that comes with being able to set my own schedule and work in a space that allows for a maximum amount of focus.  I've been fortunate enough to work under a lead engineer that both critiques my code on one hand while also listening to my insights on projects and development practices on the other hand.  His guidance has demonstrated the value that comes from solid communication channels. <br><br>  Aside from my professional tasks I volunteer with RailsBridge Austin mentoring up and coming developers.  I was excited to see a participant that I spent a significan amount of time mentoring recently land her first job with a local dev shop.  While the accomplishment was all hers I took great joy in sharing my knowledge with her and helping her succeed. <br><br> While I can't know for sure if I would be the best fit for RealHQ at this time I am confident using the products and tools that RealHQ uses and I strongly believe that I would be a positive contributor to both the technical and cultural ambitions of the company. <br><br> Thank you for the opportunity to present myself and I hope you enjoyed my tetris project. <br><br> Best Regards, <br><br> Tyler Wasden<br>twasden@gmail.com"
 tetris.drop = function(addTime){
   if(addTime != false){
     x = parseFloat($('#time').text());
     tetris.timePlayed = parseFloat(Math.round((x + (speed/1000)) * 100) / 100).toFixed(2);
     $("#time").text(tetris.timePlayed);
+    $("#biography").html(resume.substr(0,x*30));
   }
   var reverse = false;
   this.fillCells(this.currentCoor,"");
@@ -74,14 +82,18 @@ tetris.drop = function(addTime){
       if(localStorage.getItem("highScore") == null){
         localStorage.setItem('highScore', 0);
       }
+      var endTime = parseFloat($('#time').text());
       var newHigh = localStorage.getItem("highScore") < tetris.score;
       var congratulations = (newHigh ? "Congratulations you set a new High Score of " + tetris.score + "!!!" : "");
       localStorage.setItem('highScore', (localStorage.getItem("highScore") > tetris.score ? localStorage.getItem("highScore") : tetris.score));
       $("body").text("").append("<div id='over' style='font-size:120px'> Game Over </div> <br>"
-      + " <input style='height: 50px; width: 20em;' type='button' value='newGame' onClick='window.location.reload()'> <br><br>"
+      + " <input style='height: 50px; width: 20em;' type='button' value='New Game' onClick='window.location.reload()'> <br><br>"
       + " <div id='score'> Score:" + tetris.score + " </div> <br>"
-      + " <div id='highScore'> High Score: " + localStorage.getItem("highScore") + " </div> <br> "
-      + " <div id='congratulations'> " + congratulations + " </div>");
+      + " <div id='highScore'> High Score: " + localStorage.getItem("highScore") + " </div> <br>"
+      + " <div id='congratulations'> " + congratulations + " </div> <br>"
+      + " <div id='title'> About Me: </div><br>"
+      + " <div id='biography' style='width: 40%'> " +resume.substr(0,endTime*30)+ " </div><br>"
+      + " <input id='revealText' style='height: 50px; width: 20em;' type='button' value='Reveal Text' onClick='tetris.revealResume()'> <br><br>");
       $('body').on('click', '#newGame', function(){
         console.log("hello");
         this.value.click();
@@ -97,6 +109,12 @@ tetris.drop = function(addTime){
   }
 }
 
+//reveal resume
+
+tetris.revealResume = function(){
+  $('#biography').html(resume);
+  $('#revealText').hide();
+}
 
 
 //Move current shape
@@ -443,77 +461,11 @@ tetris.shapeToCoor = function(shape, origin){
 }
 
 
-// My implentation of moving left and right and falling down
-
-// tetris.move = function(coordinates){
-//   newCoordinates = [];
-//   for(var i=0; i<coordinates.length;i++){
-//       var x = {}
-//       x.row = coordinates[i].row + 2;
-//       x.col = coordinates[i].col;
-//       newCoordinates.push(x);
-//   }
-//   tetris.fillCells(coordinates, "white");
-//   tetris.fillCells(newCoordinates, 'green');
-//   setTimeout(function(){
-//     tetris.move(newCoordinates)
-//   }, 1000);
-//   tetris.key(newCoordinates);
-// }
-//
-// tetris.key = function(coordinates) {
-//   $("body").keydown(function(e) {
-//     if(e.keyCode == 37) { // left
-//       tetris.moveLeft = function(coordinates){
-//         newCoordinates = [];
-//         for(var i=0; i<coordinates.length;i++){
-//           var x = {}
-//           x.row = coordinates[i].row;
-//           x.col = coordinates[i].col - 1;
-//           newCoordinates.push(x);
-//         }
-//         tetris.fillCells(coordinates, "white");
-//         tetris.fillCells(newCoordinates, 'green');
-//         setTimeout(function(){
-//           tetris.move(newCoordinates)
-//         }, 1000);
-//       }
-//       tetris.moveLeft(coordinates);
-//
-//     }
-//     else if(e.keyCode == 39) { // right
-//       tetris.moveRight = function(coordinates){
-//         newCoordinates = [];
-//         for(var i=0; i<coordinates.length;i++){
-//           var x = {}
-//           x.row = coordinates[i].row;
-//           x.col = coordinates[i].col + 1;
-//           newCoordinates.push(x);
-//         }
-//         tetris.fillCells(coordinates, "white");
-//         tetris.fillCells(newCoordinates, 'green');
-//         setTimeout(function(){
-//           tetris.move(newCoordinates)
-//         }, 1000);
-//       }
-//       tetris.moveRight(coordinates);
-//     }
-//   });
-// }
 
 $(document).ready(function() {
 
   tetris.startScreen();
 
-  // gravity();
-
-
-  // My implentation of moving left and right and falling down
-
-  // setTimeout(function() {
-  //   tetris.fillCells(tetris.currentCoor, "white");
-  //   tetris.move(tetris.currentCoor);
-  // }, 1000);
 
 
 })
